@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UAI-小U开源版</title>
+  <link rel="shortcut icon" href="./icon.png" type="image/x-icon">
+  <style>
+      :root{
+          user-select: none;
+      }#clean{
+          border: none;
+          background: #1e90ff;
+          padding: 5px;
+          padding-left: 10px;
+          padding-right:10px;
+          margin-left: 5px;
+          transition: all .3s;
+          border-radius: 5px;
+      }#clean:active{
+          filter: brightness(.9);
+          transform: scale(.95);
+      }#clean:hover{
+          filter:brightness(1.1);
+      }
+  </style>
+</head>
+<body>
+  <h1 style="color:#1e90ff;">UAI-小U开源版</h1>
+
+  <form id="chat-form" target="iframe_sub">
+    <input type="text" style="outline:none;" autocomplete="off" id="user-input" placeholder="请输入你的问题">
+    <input id="chat-input" type="submit" value="发送">
+  </form>
+  <div style="border-radius: 7px;background: #ffffff;box-shadow:  20px 20px 60px #d9d9d9,-20px -20px 60px #ffffff;padding:2px 9px 2px 9px;margin:5px;">
+  <h3 style="color:#1e90ff; margin-top: 5px;">我猜你想说：</h3>
+    <p style="color:#1e90ff; cursor: pointer; line-height:1px;" onclick="selectQuickQuestion('/0')">0 你的版本</p>
+    <p style="color:#1e90ff; cursor: pointer; line-height:1px;" onclick="selectQuickQuestion('/1')">1 你会什么</p>
+    <p style="color:#1e90ff; cursor: pointer; line-height:1px;" onclick="selectQuickQuestion('/2')">2 反馈BUG</p>
+    <p style="color:#1e90ff; cursor: pointer; line-height:1px;" onclick="selectQuickQuestion('/3')">3 你是谁</p>
+    <p style="font-size:8px;color:#a9a9a9; margin-bottom: 5px;">点击或回复数字快捷提问</p>
+  </div>
+  <div id="chat-box">
+  </div>
+  <iframe id="iframe_sub" name="iframe" style="display: none;"></iframe>
+  <script>
+    function keywordBot() {
+      // 定义关键词和相应的回答
+      const keywords = {
+        // 快捷
+        "114514": "114514",
+        "/0": "小U目前是开源beta1.0.0版本，反馈邮箱：2696373452@qq.com",
+        "/1": "小U会帮你查找Unidev项目指南，告诉你一些小彩蛋，以及一些功能",
+        "/2": "反馈BUG请找QQ2696373452",
+        "/3": "我是由Unidev开发的UAI，我的名字叫小U",
+        // 基础
+        "你好": "你好！我是由Unidev开发的UAI，而你可以叫我小U。有什么需要帮助的尽管呼唤我。",
+        "你是谁": "你好！我是由Unidev开发的UAI，而你可以叫我小U。有什么需要帮助的尽管呼唤我。",
+        "小u": "我在，请问。",
+        "hi": "Hi！",
+        "hello": "Hello！",
+        "撅你":"🥵",
+        "你被撅了":"🥵",
+        "撅": "撅隔壁xiaym吧",
+        "再见": "再见！祝你一天愉快。",
+        "chatgpt":"ChatGPT是一个很好的东西",
+        "哼啊":"哼哼哼，啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
+        "啊":"啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
+        //功能
+        "/草图": "<img width='100%' src='https://oss.grass.starxw.com/service/image'>",
+        "时间": `现在是 ${new Date().toLocaleTimeString()}。`,
+        "官网":'https://www.unidev.top/',
+        "默认": "不好意思，你可以换个问题或换个方式问。请问有其他问题可以帮助你的吗？",
+      };
+
+      // 获取用户输入的文本
+      const userInput = document.getElementById("user-input").value;
+      // 创建新的聊天记录
+      const chatBox = document.getElementById("chat-box");
+      const userEntry = document.createElement("p");
+      userEntry.classList.add("user");
+      userEntry.textContent = `${userInput}`;
+      chatBox.appendChild(userEntry);
+      // 转换小写
+      // 获取输入框的值
+      let input = document.getElementById('user-input').value;
+      // 将输入内容转换为小写
+      let lowercase = input.replace(/\//g, '\\/').toLowerCase();
+      // 查找关键词并返回相应的回答
+      for (let keyword in keywords) {
+        if (lowercase.includes(keyword)) {
+          const botEntry = document.createElement("p");
+          botEntry.classList.add("botentry");
+          botEntry.innerHTML = `${keywords[keyword]}`;
+          chatBox.appendChild(botEntry);
+          chatBox.scrollTop = chatBox.scrollHeight; // 自动滚动到底部
+          // 获取所有具有指定类名的元素
+          var elements = document.querySelectorAll(".botentry");
+          // 创建SpeechSynthesisUtterance对象
+          var msg = new SpeechSynthesisUtterance();
+          // 获取最后一个元素
+          var lastElement = elements[elements.length - 1];  // 读取最后一个元素的文本内容
+          msg.text = lastElement.innerText;
+          // 设置语速
+          msg.rate = 1.8;
+          window.speechSynthesis.speak(msg);
+          return;
+        }
+      }
+      
+      const botEntry = document.createElement("p");
+      botEntry.classList.add("botentry");
+      botEntry.textContent = `${keywords["默认"]}`;
+      chatBox.appendChild(botEntry);
+      chatBox.scrollTop = chatBox.scrollHeight; // 自动滚动到底部
+      
+    // 获取所有具有指定类名的元素
+    var elements = document.querySelectorAll(".botentry");
+    // 创建SpeechSynthesisUtterance对象
+    var msg = new SpeechSynthesisUtterance();
+    // 获取最后一个元素
+    var lastElement = elements[elements.length - 1];  // 读取最后一个元素的文本内容
+    msg.text = lastElement.innerText;
+    // 设置语速
+    msg.rate = 1.8;
+    window.speechSynthesis.speak(msg);
+    
+    }
+
+    // 监听表单提交事件
+    document.getElementById("chat-form").addEventListener("submit", function(event) {
+      event.preventDefault(); // 阻止表单默认提交
+      keywordBot(); 
+      document.getElementById("user-input").value = ""; // 清空输入框
+    });
+    function selectQuickQuestion(question) {
+      document.getElementById("user-input").value = question;
+      document.getElementById("chat-input").click();
+    }
+  </script>
+</body>
+</html>
